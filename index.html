@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0b12">
+  <meta name="description" content="KKGaming News — gaming news, updates, events and announcements.">
+  <title>KKGaming News</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg: #0b0b12;
+      --panel: #141420;
+      --panel2: #1c1c2b;
+      --text: #f5f5ff;
+      --muted: #a4a4ba;
+      --purple: #8b5cf6;
+      --green: #39e58c;
+      --border: #29293b;
+      --danger: #ff647c;
+      --radius: 17px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    a {
+      color: var(--green);
+      overflow-wrap: anywhere;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .container {
+      width: min(100% - 28px, 1000px);
+      margin: auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(11, 11, 18, .94);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar {
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      width: 43px;
+      height: 43px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--purple), #4f46e5);
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .brand h1 {
+      font-size: 17px;
+      letter-spacing: -.4px;
+    }
+
+    .brand p {
+      color: var(--green);
+      font-size: 10px;
+      margin-top: 3px;
+    }
+
+    .header-button {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    main {
+      padding-top: 20px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #37304e;
+      border-radius: 23px;
+      padding: 28px 22px;
+      background:
+        radial-gradient(circle at 90% 10%, #5635a4 0, transparent 35%),
+        linear-gradient(135deg, #1d1932, #11111c 70%);
+      margin-bottom: 25px;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      color: var(--green);
+      border: 1px solid #285b43;
+      background: #11281e;
+      border-radius: 30px;
+      padding: 6px 10px;
+      font-size: 11px;
+      margin-bottom: 15px;
+    }
+
+    .hero h2 {
+      font-size: clamp(27px, 6vw, 42px);
+      line-height: 1.12;
+      max-width: 560px;
+      letter-spacing: -1.1px;
+    }
+
+    .hero p {
+      color: #c3c0d6;
+      line-height: 1.7;
+      margin-top: 12px;
+      max-width: 530px;
+      font-size: 14px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 21px;
+    }
+
+    .primary,
+    .secondary,
+    .danger-button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .primary {
+      background: var(--green);
+      color: #07150d;
+    }
+
+    .secondary {
+      background: var(--panel2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .danger-button {
+      background: #411d29;
+      color: #ffb4c0;
+    }
+
+    .full {
+      width: 100%;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 24px 0 14px;
+    }
+
+    .section-heading h2 {
+      font-size: 19px;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .search-wrap {
+      margin: 20px 0 15px;
+    }
+
+    .search-wrap input,
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      color: var(--text);
+      outline: none;
+    }
+
+    .search-wrap input:focus,
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: var(--purple);
+    }
+
+    .field textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: #c7c6d8;
+      margin-bottom: 8px;
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .chips {
+      display: flex;
+      gap: 9px;
+      overflow-x: auto;
+      padding: 2px 0 10px;
+      scrollbar-width: none;
+    }
+
+    .chips::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chip {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: #d0cfe0;
+      padding: 9px 13px;
+      border-radius: 30px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .chip.active {
+      background: var(--purple);
+      border-color: var(--purple);
+      color: white;
+    }
+
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    .news-card {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: var(--radius);
+    }
+
+    .news-image {
+      height: 145px;
+      background:
+        radial-gradient(circle at 75% 25%, #57369c, transparent 40%),
+        linear-gradient(135deg, #26223c, #101019);
+      display: grid;
+      place-items: center;
+      font-size: 40px;
+      overflow: hidden;
+    }
+
+    .news-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .news-content {
+      padding: 13px;
+    }
+
+    .badge {
+      display: inline-block;
+      border-radius: 30px;
+      padding: 5px 8px;
+      font-size: 10px;
+      background: #29203e;
+      color: #c9b7ff;
+      margin-bottom: 9px;
+    }
+
+    .news-content h3 {
+      font-size: 15px;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .news-content p {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .card-footer small {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .save-button {
+      border: 1px solid var(--border);
+      background: var(--panel2);
+      color: var(--text);
+      border-radius: 9px;
+      padding: 7px 9px;
+      font-size: 12px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px 18px;
+      border: 1px dashed #3a394e;
+      border-radius: var(--radius);
+      color: var(--muted);
+      line-height: 1.8;
+      grid-column: 1 / -1;
+    }
+
+    .page {
+      display: none;
+      padding-bottom: 25px;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .panel h2 {
+      font-size: 21px;
+      margin-bottom: 7px;
+    }
+
+    .panel > p {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    .notice {
+      background: #171b29;
+      border: 1px solid #303750;
+      color: #c8d5ff;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 13px 0;
+    }
+
+    .status-message {
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 12px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .status-message.error {
+      color: #ff8a9d;
+    }
+
+    .status-message.success {
+      color: var(--green);
+    }
+
+    .event-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 17px;
+      margin-bottom: 12px;
+    }
+
+    .event-card h3 {
+      font-size: 15px;
+      margin: 8px 0;
+    }
+
+    .event-card p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .article-body {
+      white-space: pre-wrap;
+      line-height: 1.8;
+      color: #d9d8e7;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+      margin-top: 14px;
+    }
+
+    .article-image {
+      width: 100%;
+      max-height: 330px;
+      object-fit: cover;
+      border-radius: 14px;
+      margin-top: 15px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(17, 17, 27, .97);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 9px 4px max(9px, env(safe-area-inset-bottom));
+    }
+
+    .nav-button {
+      border: 0;
+      background: transparent;
+      color: #8f8fa7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 1px;
+      font-size: 10px;
+    }
+
+    .nav-button span {
+      font-size: 19px;
+    }
+
+    .nav-button.active {
+      color: var(--green);
+    }
+
+    footer {
+      color: #77778d;
+      text-align: center;
+      font-size: 11px;
+      padding: 20px 0 10px;
+    }
+
+    @media (min-width: 700px) {
+      .hero {
+        padding: 42px;
+      }
+
+      .news-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 17px;
+      }
+
+      .news-image {
+        height: 175px;
+      }
+
+      .bottom-nav {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: min(100%, 650px);
+        border: 1px solid var(--border);
+        border-bottom: 0;
+        border-radius: 18px 18px 0 0;
+      }
+    }
+
+    @media (max-width: 370px) {
+      .news-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .brand h1 {
+        font-size: 15px;
+      }
+
+      .header-button {
+        padding: 9px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container topbar">
+      <div class="brand" onclick="showPage('home')">
+        <div class="brand-icon">🎮</div>
+        <div>
+          <h1>KKGaming News</h1>
+          <p>YOUR GAMING WORLD</p>
+        </div>
+      </div>
+
+      <button class="header-button" onclick="showPage('account')">
+        👤 Account
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="page active" id="page-home">
+      <div class="hero">
+        <span class="hero-tag">🎮 GAMING CENTRAL</span>
+        <h2>Your games.<br>Your news. Your world.</h2>
+        <p>
+          Discover gaming updates, new releases, events and announcements
+          from the games you love.
+        </p>
+        <div class="hero-actions">
+          <button class="primary" onclick="document.getElementById('news-area').scrollIntoView({behavior:'smooth'})">
+            Explore news
+          </button>
+          <button class="secondary" onclick="showPage('events')">
+            View events
+          </button>
+        </div>
+      </div>
+
+      <div class="section-heading">
+        <div>
+          <h2>Find your game</h2>
+          <p>Choose a game to filter the news.</p>
+        </div>
+      </div>
+
+      <div class="chips" id="game-chips"></div>
+
+      <div class="search-wrap">
+        <input id="search-input" type="search"
+          placeholder="🔎 Search gaming news..."
+          autocomplete="off" aria-label="Search gaming news">
+      </div>
+
+      <div id="news-area">
+        <div class="section-heading">
+          <div>
+            <h2>Latest news</h2>
+            <p id="news-count">Gaming updates for you</p>
+          </div>
+          <button class="secondary" onclick="loadNews()">↻ Refresh</button>
+        </div>
+        <div id="news-grid" class="news-grid"></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-saved">
+      <div class="section-heading">
+        <div>
+          <h2>❤️ Saved news</h2>
+          <p>Your bookmarked gaming stories.</p>
+        </div>
+      </div>
+      <div id="saved-grid" class="news-grid"></div>
+    </section>
+
+    <section class="page" id="page-events">
+      <div class="section-heading">
+        <div>
+          <h2>🏆 Gaming events</h2>
+          <p>Events and announcements published on KKGaming News.</p>
+        </div>
+      </div>
+      <div id="events-list"></div>
+    </section>
+
+    <section class="page" id="page-account">
+      <div class="panel">
+        <h2>👤 Your account</h2>
+        <p>Create an account or sign in to KKGaming News.</p>
+
+        <div id="account-status" class="status-message"></div>
+
+        <form id="auth-form">
+          <div class="field">
+            <label for="auth-username">Username (for new accounts)</label>
+            <input id="auth-username" type="text" maxlength="30"
+              placeholder="Choose a username" autocomplete="username">
+          </div>
+
+          <div class="field">
+            <label for="auth-email">Email address</label>
+            <input id="auth-email" type="email"
+              placeholder="you@example.com" autocomplete="email" required>
+          </div>
+
+          <div class="field">
+            <label for="auth-password">Password</label>
+            <input id="auth-password" type="password" minlength="6"
+              placeholder="At least 6 characters"
+              autocomplete="current-password" required>
+          </div>
+
+          <button class="primary full" id="auth-submit" type="submit">
+            Sign in
+          </button>
+        </form>
+
+        <button class="secondary full" id="auth-toggle" type="button"
+          style="margin-top:10px">
+          Need an account? Sign up
+        </button>
+
+        <button class="danger-button full hidden" id="logout" type="button"
+          style="margin-top:10px">
+          Log out
+        </button>
+
+        <div class="notice">
+          Supabase manages your account. If email confirmation is enabled,
+          check your inbox after signing up.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>🎮 Your games</h2>
+        <p>Choose the games you want to follow.</p>
+        <div class="chips" id="account-game-chips"></div>
+        <button class="primary full" onclick="saveGamePreferences()">
+          Save my games
+        </button>
+        <div id="preferences-message" class="status-message"></div>
+      </div>
+
+      <div class="panel hidden" id="publisher-entry">
+        <h2>📰 News publisher</h2>
+        <p>You have administrator access.</p>
+        <button class="primary full" onclick="showPage('publisher')">
+          Open publisher
+        </button>
+      </div>
+    </section>
+
+    <section class="page" id="page-publisher">
+      <div class="panel">
+        <h2>📰 Publish gaming news</h2>
+        <p>Only an approved administrator can publish articles online.</p>
+
+        <div id="publisher-status" class="status-message"></div>
+
+        <form id="publisher-form">
+          <div class="field">
+            <label for="article-title">Article title</label>
+            <input id="article-title" type="text" maxlength="150" required>
+          </div>
+
+          <div class="field">
+            <label for="article-game">Game</label>
+            <select id="article-game" required></select>
+          </div>
+
+          <div class="field">
+            <label for="article-category">Category</label>
+            <select id="article-category" required>
+              <option value="News">News</option>
+              <option value="Update">Update</option>
+              <option value="Event">Event</option>
+              <option value="Announcement">Announcement</option>
+              <option value="Esports">Esports</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="article-summary">Short summary</label>
+            <textarea id="article-summary" maxlength="500" required></textarea>
+          </div>
+
+          <div class="field">
+            <label for="article-body">Full article (optional)</label>
+            <textarea id="article-body" maxlength="10000"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="article-image">Image URL (optional)</label>
+            <input id="article-image" type="url"
+              placeholder="https://example.com/image.jpg">
+          </div>
+
+          <div class="field">
+            <label for="article-source">Source URL (optional)</label>
+            <input id="article-source" type="url"
+              placeholder="https://official-game-site.com">
+          </div>
+
+          <button class="primary full" id="publish-button" type="submit">
+            Publish article
+          </button>
+        </form>
+      </div>
+
+      <button class="secondary full" onclick="showPage('home')">
+        ← Back to home
+      </button>
+    </section>
+
+    <section class="page" id="page-article">
+      <button class="secondary" onclick="showPage('home')">← Back</button>
+      <div id="article-detail" class="panel" style="margin-top:15px"></div>
+    </section>
+
+    <footer>
+      <p>© <span id="year"></span> KKGaming News</p>
+      <p style="margin-top:6px">Built for gamers 🎮</p>
+    </footer>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <button class="nav-button active" data-page="home" onclick="showPage('home')">
+      <span>🏠</span>Home
+    </button>
+    <button class="nav-button" data-page="saved" onclick="showPage('saved')">
+      <span>❤️</span>Saved
+    </button>
+    <button class="nav-button" data-page="events" onclick="showPage('events')">
+      <span>🏆</span>Events
+    </button>
+    <button class="nav-button" data-page="publisher" onclick="openPublisher()">
+      <span>📰</span>Publish
+    </button>
+    <button class="nav-button" data-page="account" onclick="showPage('account')">
+      <span>👤</span>Account
+    </button>
+  </nav>
+
+  <script>
+    /* 1. SUPABASE CONFIGURATION */
+
+    const SUPABASE_URL = "https://ncrlagqvaxwncuuwidzc.supabase.co/rest/v1/";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_rrFCTlSFqEKwJgTLL-qIPw_5VyE7sTH";
+
+    let supabaseClient = null;
+
+    if (
+      window.supabase &&
+      SUPABASE_URL.startsWith("https://") &&
+      !SUPABASE_URL.includes("PASTE_") &&
+      SUPABASE_PUBLISHABLE_KEY &&
+      !SUPABASE_PUBLISHABLE_KEY.includes("PASTE_")
+    ) {
+      supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+    }
+
+    /* 2. GAMES AND STARTER ARTICLES */
+
+    const gameNames = [
+      "All Games",
+      "Free Fire",
+      "Fortnite",
+      "Roblox",
+      "Call of Duty Mobile",
+      "Blood Strike",
+      "Minecraft",
+      "PUBG Mobile",
+      "Genshin Impact",
+      "Other"
+    ];
+
+    const gameIcons = {
+      "All Games": "🎮",
+      "Free Fire": "🔥",
+      "Fortnite": "🪂",
+      "Roblox": "🧱",
+      "Call of Duty Mobile": "🎯",
+      "Blood Strike": "💥",
+      "Minecraft": "⛏️",
+      "PUBG Mobile": "🪖",
+      "Genshin Impact": "✨",
+      "Other": "🎮"
+    };
+
+    const defaultNews = [
+      {
+        id: "starter-1",
+        title: "Welcome to KKGaming News!",
+        game: "All Games",
+        category: "Announcement",
+        summary: "Your gaming news hub is ready. Explore updates and follow your favourite games.",
+        body: "Welcome to KKGaming News! This starter article demonstrates how news appears on your website.",
+        image: "",
+        source: "",
+        date: new Date().toISOString()
+      },
+      {
+        id: "starter-2",
+        title: "Free Fire: Follow official announcements",
+        game: "Free Fire",
+        category: "News",
+        summary: "Check official announcements for confirmed events, updates and rewards.",
+        body: "Visit the official channels to verify event dates, update details and rewards.",
+        image: "",
+        source: "https://ff.garena.com/",
+        date: new Date().toISOString()
+      },
+      {
+        id: "starter-3",
+        title: "Fortnite: Keep up with game updates",
+        game: "Fortnite",
+        category: "Update",
+        summary: "Stay informed about official patch notes, events and new content.",
+        body: "Check official Fortnite announcements for accurate update information.",
+        image: "",
+        source: "https://www.fortnite.com/",
+        date: new Date().toISOString()
+      }
+    ];
+
+    /* 3. STORAGE AND APP STATE */
+
+    function readStorage(key, fallback) {
+      try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+
+    function writeStorage(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    let news = readStorage("kk_news", defaultNews);
+    let savedIds = readStorage("kk_saved", []);
+    let selectedGames = readStorage("kk_selected_games", [
+      "Free Fire",
+      "Fortnite",
+      "Roblox"
+    ]);
+
+    let selectedGame = "All Games";
+    let searchQuery = "";
+    let signupMode = false;
+    let currentUser = null;
+    let isAdmin = false;
+
+    const $ = id => document.getElementById(id);
+
+    $("year").textContent = new Date().getFullYear();
+
+    /* 4. HELPERS */
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]);
+    }
+
+    function validHttpUrl(value) {
+      if (!value) return "";
+
+      try {
+        const url = new URL(value);
+
+        return url.protocol === "https:" || url.protocol === "http:"
+          ? url.href
+          : "";
+      } catch {
+        return "";
+      }
+    }
+
+    function formatDate(value) {
+      if (!value) return "Recently";
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) return "Recently";
+
+      return date.toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      });
+    }
+
+    function setMessage(elementId, message, type = "") {
+      const element = $(elementId);
+
+      if (!element) return;
+
+      element.textContent = message;
+      element.className = "status-message" + (type ? " " + type : "");
+    }
+
+    function normalizeArticle(row) {
+      return {
+        id: String(row.id),
+        title: row.title || "Untitled",
+        game: row.game || "Other",
+        category: row.category || "News",
+        summary: row.summary || "",
+        body: row.body || "",
+        image: row.image || "",
+        source: row.source || "",
+        date: row.date || row.created_at || new Date().toISOString()
+      };
+    }
+
+    /* 5. PAGE NAVIGATION */
+
+    function showPage(pageName) {
+      if (!$("page-" + pageName)) {
+        pageName = "home";
+      }
+
+      document.querySelectorAll(".page").forEach(page => {
+        page.classList.toggle("active", page.id === "page-" + pageName);
+      });
+
+      document.querySelectorAll(".nav-button").forEach(button => {
+        button.classList.toggle(
+          "active",
+          button.dataset.page === pageName
+        );
+      });
+
+      if (pageName === "saved") renderSaved();
+      if (pageName === "events") renderEvents();
+      if (pageName === "account") updateAccountStatus();
+      if (pageName === "publisher") checkPublisherAccess();
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* 6. GAME FILTERS */
+
+    function renderGameChips() {
+      $("game-chips").innerHTML = gameNames.map(game => `
+        <button
+          class="chip ${selectedGame === game ? "active" : ""}"
+          type="button"
+          onclick="selectGame('${escapeHTML(game)}')">
+          ${gameIcons[game] || "🎮"} ${escapeHTML(game)}
+        </button>
+      `).join("");
+
+      $("account-game-chips").innerHTML = gameNames
+        .filter(game => game !== "All Games")
+        .map(game => `
+          <button
+            class="chip ${selectedGames.includes(game) ? "active" : ""}"
+            type="button"
+            onclick="togglePreferredGame('${escapeHTML(game)}', this)">
+            ${gameIcons[game] || "🎮"} ${escapeHTML(game)}
+          </button>
+        `).join("");
+
+      $("article-game").innerHTML = gameNames
+        .filter(game => game !== "All Games")
+        .map(game => `
+          <option value="${escapeHTML(game)}">
+            ${gameIcons[game] || "🎮"} ${escapeHTML(game)}
+          </option>
+        `).join("");
+    }
+
+    function selectGame(game) {
+      selectedGame = gameNames.includes(game) ? game : "All Games";
+      renderGameChips();
+      renderNews();
+    }
+
+    function togglePreferredGame(game, button) {
+      if (selectedGames.includes(game)) {
+        selectedGames = selectedGames.filter(item => item !== game);
+      } else {
+        selectedGames.push(game);
+      }
+
+      button.classList.toggle("active", selectedGames.includes(game));
+    }
+
+    /* 7. NEWS CARDS */
+
+    function makeNewsCard(article) {
+      const isSaved = savedIds.includes(String(article.id));
+      const image = validHttpUrl(article.image);
+      const icon = gameIcons[article.game] || "🎮";
+
+      return `
+        <article class="news-card">
+          <div class="news-image">
+            ${
+              image
+                ? `<img src="${escapeHTML(image)}"
+                        alt="${escapeHTML(article.title)}"
+                        loading="lazy"
+                        onerror="this.remove()">`
+                : icon
+            }
+          </div>
+
+          <div class="news-content">
+            <span class="badge">
+              ${escapeHTML(article.game)} · ${escapeHTML(article.category)}
+            </span>
+
+            <h3>${escapeHTML(article.title)}</h3>
+            <p>${escapeHTML(article.summary)}</p>
+
+            <div class="card-footer">
+              <small>${escapeHTML(formatDate(article.date))}</small>
+
+              <button class="save-button" type="button"
+                onclick="toggleSaved('${escapeHTML(article.id)}')">
+                ${isSaved ? "❤️" : "🤍"}
+              </button>
+            </div>
+
+            <button class="secondary full" style="margin-top:10px"
+              type="button"
+              onclick="openArticle('${escapeHTML(article.id)}')">
+              Read more →
+            </button>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderNews() {
+      const query = searchQuery.toLowerCase().trim();
+
+      const filtered = news.filter(article => {
+        const gameMatches =
+          selectedGame === "All Games" ||
+          article.game === selectedGame ||
+          article.game === "All Games";
+
+        const text = [
+          article.title,
+          article.summary,
+          article.body,
+          article.game,
+          article.category
+        ].join(" ").toLowerCase();
+
+        return gameMatches && text.includes(query);
+      });
+
+      $("news-count").textContent =
+        `${filtered.length} article${filtered.length === 1 ? "" : "s"}`;
+
+      $("news-grid").innerHTML = filtered.length
+        ? filtered.map(makeNewsCard).join("")
+        : `<div class="empty">🔎 No news found.<br>Try another game or search term.</div>`;
+    }
+
+    function renderSaved() {
+      const savedNews = news.filter(article =>
+        savedIds.includes(String(article.id))
+      );
+
+      $("saved-grid").innerHTML = savedNews.length
+        ? savedNews.map(makeNewsCard).join("")
+        : `<div class="empty">❤️ No saved articles yet.<br>Tap the heart on a news card to save it.</div>`;
+    }
+
+    function toggleSaved(id) {
+      id = String(id);
+
+      if (savedIds.includes(id)) {
+        savedIds = savedIds.filter(item => item !== id);
+      } else {
+        savedIds.push(id);
+      }
+
+      writeStorage("kk_saved", savedIds);
+      renderNews();
+      renderSaved();
+
+      if ($("page-article").classList.contains("active")) {
+        openArticle(id);
+      }
+    }
+
+    function renderEvents() {
+      const events = news.filter(article =>
+        String(article.category).toLowerCase() === "event"
+      );
+
+      $("events-list").innerHTML = events.length
+        ? events.map(article => `
+            <article class="event-card">
+              <span class="badge">${escapeHTML(article.game)}</span>
+              <h3>${escapeHTML(article.title)}</h3>
+              <p>${escapeHTML(article.summary)}</p>
+              <p style="margin-top:8px">${escapeHTML(formatDate(article.date))}</p>
+              <button class="secondary" style="margin-top:12px"
+                onclick="openArticle('${escapeHTML(article.id)}')">
+                View details
+              </button>
+            </article>
+          `).join("")
+        : `<div class="empty">🏆 No events have been published yet.</div>`;
+    }
+
+    function openArticle(id) {
+      const article = news.find(item => String(item.id) === String(id));
+
+      if (!article) {
+        alert("This article could not be found.");
+        return;
+      }
+
+      const image = validHttpUrl(article.image);
+      const source = validHttpUrl(article.source);
+
+      $("article-detail").innerHTML = `
+        <span class="badge">
+          ${escapeHTML(article.game)} · ${escapeHTML(article.category)}
+        </span>
+
+        <h2>${escapeHTML(article.title)}</h2>
+
+        <p class="muted" style="margin-top:8px">
+          ${escapeHTML(formatDate(article.date))}
+        </p>
+
+        ${
+          image
+            ? `<img class="article-image"
+                    src="${escapeHTML(image)}"
+                    alt="${escapeHTML(article.title)}">`
+            : ""
+        }
+
+        <p style="margin-top:18px;line-height:1.7">
+          ${escapeHTML(article.summary)}
+        </p>
+
+        <div class="article-body">
+          ${escapeHTML(article.body || article.summary)}
+        </div>
+
+        ${
+          source
+            ? `<p style="margin-top:18px">
+                 Source:
+                 <a href="${escapeHTML(source)}"
+                    target="_blank"
+                    rel="noopener noreferrer">Read original source</a>
+               </p>`
+            : ""
+        }
+
+        <button class="primary full" style="margin-top:20px"
+          onclick="toggleSaved('${escapeHTML(article.id)}')">
+          ${savedIds.includes(String(article.id))
+            ? "❤️ Saved — tap to unsave"
+            : "🤍 Save this article"}
+        </button>
+      `;
+
+      showPage("article");
+    }
+
+    /* 8. SEARCH */
+
+    $("search-input").addEventListener("input", event => {
+      searchQuery = event.target.value || "";
+      renderNews();
+    });
+
+    /* 9. ACCOUNT DISPLAY */
+
+    function updateAccountStatus() {
+      const status = $("account-status");
+
+      if (currentUser) {
+        status.className = "status-message success";
+        status.textContent = "Signed in as " + currentUser.email;
+
+        $("auth-form").classList.add("hidden");
+        $("auth-toggle").classList.add("hidden");
+        $("logout").classList.remove("hidden");
+
+        $("publisher-entry").classList.toggle("hidden", !isAdmin);
+      } else {
+        status.className = "status-message";
+
+        status.textContent = supabaseClient
+          ? "You are not signed in."
+          : "Add your Supabase Project URL and Publishable Key to enable accounts.";
+
+        $("auth-form").classList.remove("hidden");
+        $("auth-toggle").classList.remove("hidden");
+        $("logout").classList.add("hidden");
+        $("publisher-entry").classList.add("hidden");
+
+        $("auth-submit").textContent =
+          signupMode ? "Create account" : "Sign in";
+
+        $("auth-toggle").textContent = signupMode
+          ? "Already have an account? Sign in"
+          : "Need an account? Sign up";
+      }
+    }
+
+    $("auth-toggle").addEventListener("click", () => {
+      signupMode = !signupMode;
+
+      $("auth-password").setAttribute(
+        "autocomplete",
+        signupMode ? "new-password" : "current-password"
+      );
+
+      updateAccountStatus();
+    });
+
+    /* 10. SIGN-UP AND LOGIN */
+
+    $("auth-form").addEventListener("submit", async event => {
+      event.preventDefault();
+
+      if (!supabaseClient) {
+        setMessage(
+          "account-status",
+          "Supabase is not configured. Check your Project URL and Publishable Key.",
+          "error"
+        );
+        return;
+      }
+
+      const email = $("auth-email").value.trim();
+      const password = $("auth-password").value;
+      const username = $("auth-username").value.trim();
+      const button = $("auth-submit");
+
+      if (signupMode && !username) {
+        setMessage("account-status", "Please choose a username.", "error");
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = signupMode
+        ? "Creating account..."
+        : "Signing in...";
+
+      try {
+        if (signupMode) {
+          const { data, error } = await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: {
+              data: { username }
+            }
+          });
+
+          if (error) throw error;
+
+          if (data.session) {
+            await refreshSession();
+
+            setMessage(
+              "account-status",
+              "Your account has been created.",
+              "success"
+            );
+          } else {
+            signupMode = false;
+
+            setMessage(
+              "account-status",
+              "Account created. Check your email for the confirmation link, then sign in.",
+              "success"
+            );
+          }
+        } else {
+          const { error } = await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
+
+          if (error) throw error;
+
+          await refreshSession();
+
+          setMessage(
+            "account-status",
+            "You are signed in.",
+            "success"
+          );
+        }
+      } catch (error) {
+        setMessage(
+          "account-status",
+          error.message || "Something went wrong. Please try again.",
+          "error"
+        );
+      } finally {
+        button.disabled = false;
+        updateAccountStatus();
+      }
+    });
+
+    /* 11. SESSION AND LOGOUT */
+
+    async function refreshSession() {
+      if (!supabaseClient) return;
+
+      const { data, error } = await supabaseClient.auth.getSession();
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      currentUser = data.session ? data.session.user : null;
+
+      await checkAdminRole();
+      updateAccountStatus();
+    }
+
+    async function logout() {
+      if (!supabaseClient) return;
+
+      const { error } = await supabaseClient.auth.signOut();
+
+      if (error) {
+        setMessage("account-status", error.message, "error");
+        return;
+      }
+
+      currentUser = null;
+      isAdmin = false;
+
+      updateAccountStatus();
+      showPage("home");
+      alert("You have logged out.");
+    }
+
+    $("logout").addEventListener("click", logout);
+
+    /* 12. ADMIN ROLE CHECK */
+
+    async function checkAdminRole() {
+      isAdmin = false;
+
+      if (!supabaseClient || !currentUser) {
+        $("publisher-entry").classList.add("hidden");
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("profiles")
+          .select("is_admin")
+          .eq("id", currentUser.id)
+          .maybeSingle();
+
+        if (!error && data && data.is_admin === true) {
+          isAdmin = true;
+        }
+      } catch (error) {
+        console.warn("Admin role check failed:", error);
+      }
+
+      $("publisher-entry").classList.toggle("hidden", !isAdmin);
+    }
+
+    function openPublisher() {
+      if (!currentUser) {
+        showPage("account");
+
+        setMessage(
+          "account-status",
+          "Sign in before opening the publisher.",
+          "error"
+        );
+
+        return;
+      }
+
+      if (!isAdmin) {
+        showPage("account");
+
+        setMessage(
+          "account-status",
+          "Your account has not been approved as an administrator.",
+          "error"
+        );
+
+        return;
+      }
+
+      showPage("publisher");
+    }
+
+    function checkPublisherAccess() {
+      if (!currentUser || !isAdmin) {
+        showPage("account");
+
+        setMessage(
+          "account-status",
+          "Only an approved administrator can publish articles.",
+          "error"
+        );
+      }
+    }
+
+    /* 13. LOAD ONLINE NEWS */
+
+    async function loadNews() {
+      if (!supabaseClient) {
+        renderNews();
+        renderSaved();
+        renderEvents();
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("news")
+          .select("id,title,game,category,summary,body,image,source,created_at")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          news = data.map(normalizeArticle);
+          writeStorage("kk_news", news);
+        } else {
+          news = readStorage("kk_news", defaultNews);
+        }
+      } catch (error) {
+        console.warn("Online news could not be loaded:", error.message);
+        news = readStorage("kk_news", defaultNews);
+      }
+
+      renderNews();
+      renderSaved();
+      renderEvents();
+    }
+
+    /* 14. PUBLISH ONLINE NEWS */
+
+    $("publisher-form").addEventListener("submit", async event => {
+      event.preventDefault();
+
+      if (!supabaseClient || !currentUser || !isAdmin) {
+        setMessage(
+          "publisher-status",
+          "You need approved administrator permission to publish.",
+          "error"
+        );
+        return;
+      }
+
+      const title = $("article-title").value.trim();
+      const game = $("article-game").value;
+      const category = $("article-category").value;
+      const summary = $("article-summary").value.trim();
+      const body = $("article-body").value.trim();
+      const image = $("article-image").value.trim();
+      const source = $("article-source").value.trim();
+
+      if (!title || !game || !category || !summary) {
+        setMessage(
+          "publisher-status",
+          "Please complete all required fields.",
+          "error"
+        );
+        return;
+      }
+
+      if (image && !validHttpUrl(image)) {
+        setMessage("publisher-status", "Enter a valid image URL.", "error");
+        return;
+      }
+
+      if (source && !validHttpUrl(source)) {
+        setMessage("publisher-status", "Enter a valid source URL.", "error");
+        return;
+      }
+
+      const button = $("publish-button");
+
+      button.disabled = true;
+      button.textContent = "Publishing...";
+
+      try {
+        const { error } = await supabaseClient
+          .from("news")
+          .insert({
+            title,
+            game,
+            category,
+            summary,
+            body,
+            image: image || null,
+            source: source || null,
+            author_id: currentUser.id
+          });
+
+        if (error) throw error;
+
+        $("publisher-form").reset();
+
+        setMessage(
+          "publisher-status",
+          "Article published successfully!",
+          "success"
+        );
+
+        await loadNews();
+        showPage("home");
+      } catch (error) {
+        setMessage(
+          "publisher-status",
+          "Could not publish: " + error.message +
+          ". Check the news table and its permissions.",
+          "error"
+        );
+      } finally {
+        button.disabled = false;
+        button.textContent = "Publish article";
+      }
+    });
+
+    /* 15. GAME PREFERENCES */
+
+    function saveGamePreferences() {
+      const saved = writeStorage("kk_selected_games", selectedGames);
+
+      setMessage(
+        "preferences-message",
+        saved
+          ? "Your game preferences have been saved on this device."
+          : "Could not save your preferences.",
+        saved ? "success" : "error"
+      );
+
+      selectedGame = "All Games";
+      renderGameChips();
+      renderNews();
+    }
+
+    /* 16. START THE WEBSITE */
+
+    async function initializeApp() {
+      renderGameChips();
+      renderNews();
+      renderSaved();
+      renderEvents();
+      updateAccountStatus();
+
+      if (!supabaseClient) {
+        console.warn(
+          "Supabase is not configured. Online accounts and publishing are disabled."
+        );
+        return;
+      }
+
+      supabaseClient.auth.onAuthStateChange((_event, session) => {
+        currentUser = session ? session.user : null;
+
+        setTimeout(async () => {
+          await checkAdminRole();
+          updateAccountStatus();
+        }, 0);
+      });
+
+      await refreshSession();
+      await loadNews();
+    }
+
+    initializeApp();
+  </script>
+</body>
+</html>
