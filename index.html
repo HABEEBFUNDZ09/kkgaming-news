@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b12">
+<meta name="description" content="KKGaming News — Your home for gaming news, updates and tournaments.">
+<title>KKGaming News</title>
+
+<style>
+:root {
+  --bg: #080b12;
+  --panel: #111722;
+  --panel2: #192231;
+  --text: #f4f7ff;
+  --muted: #9ca9bd;
+  --accent: #8b5cf6;
+  --green: #41f2a0;
+  --border: #263144;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+button, input { font: inherit; }
+button { cursor: pointer; }
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 15px;
+  background: rgba(8,11,18,.96);
+  border-bottom: 1px solid var(--border);
+}
+.logo { font-size: 19px; font-weight: 900; }
+.logo span { color: var(--green); }
+.avatar {
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  background: var(--panel2);
+  color: white;
+  font-size: 20px;
+}
+main { max-width: 850px; margin: auto; padding: 18px 15px 95px; }
+.hero {
+  padding: 25px 20px;
+  border-radius: 22px;
+  background: linear-gradient(135deg,#24174b,#151d39 60%,#0c332b);
+  border: 1px solid #403365;
+}
+.badge {
+  display: inline-block;
+  background: rgba(65,242,160,.13);
+  color: var(--green);
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.hero h1 { font-size: 32px; line-height: 1.15; margin: 15px 0 10px; }
+.hero p { color: #d1d5e5; line-height: 1.6; }
+.primary {
+  background: var(--green);
+  color: #06120c;
+  border: 0;
+  border-radius: 11px;
+  padding: 12px 17px;
+  font-weight: 800;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 26px 0 14px;
+}
+h2 { font-size: 19px; margin: 0; }
+.muted { color: var(--muted); font-size: 12px; }
+.search {
+  width: 100%;
+  margin: 18px 0;
+  background: var(--panel);
+  color: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  outline: none;
+}
+.search:focus { border-color: var(--accent); }
+.games {
+  display: flex;
+  gap: 9px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+.game {
+  flex: 0 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 11px 14px;
+  border-radius: 12px;
+}
+.game.active {
+  background: #38245e;
+  border-color: var(--accent);
+  color: white;
+}
+.news-list { display: grid; gap: 13px; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.tag {
+  font-size: 11px;
+  color: var(--green);
+  background: rgba(65,242,160,.1);
+  padding: 5px 8px;
+  border-radius: 6px;
+}
+.card h3 { margin: 13px 0 8px; font-size: 17px; }
+.card p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+.card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 13px;
+}
+.small-btn {
+  border: 1px solid var(--border);
+  background: var(--panel2);
+  color: white;
+  padding: 8px 11px;
+  border-radius: 9px;
+}
+.small-btn.saved { color: var(--green); border-color: var(--green); }
+nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 15;
+  display: flex;
+  justify-content: space-around;
+  padding: 11px 5px calc(11px + env(safe-area-inset-bottom));
+  background: #0e131e;
+  border-top: 1px solid var(--border);
+}
+nav button {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  font-size: 11px;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+}
+nav button span { font-size: 20px; }
+nav button.active { color: var(--green); }
+.page { display: none; }
+.page.active { display: block; }
+input, textarea, select {
+  max-width: 100%;
+}
+.field {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: white;
+}
+.full { width: 100%; margin-top: 10px; }
+.notice {
+  background: #171e2b;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 13px;
+  border-radius: 11px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+footer { text-align: center; color: var(--muted); font-size: 11px; padding: 25px 0; }
+.empty { text-align: center; padding: 30px 10px; color: var(--muted); }
+@media (min-width: 650px) {
+  .news-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .hero h1 { font-size: 42px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo">KK<span>GAMING</span> NEWS 🎮</div>
+  <button class="avatar" onclick="showPage('account')" aria-label="Account">👤</button>
+</header>
+
+<main>
+  <section id="home" class="page active">
+    <div class="hero">
+      <span class="badge">YOUR GAMING WORLD</span>
+      <h1>LEVEL UP YOUR<br>GAMING KNOWLEDGE.</h1>
+      <p>Gaming news, updates, events and tournaments — all in one place.</p>
+      <button class="primary" onclick="document.getElementById('news-section').scrollIntoView({behavior:'smooth'})">Explore News →</button>
+    </div>
+
+    <input id="search" class="search" type="search" placeholder="🔎 Search gaming news..." oninput="renderNews()">
+
+    <div class="section-head">
+      <h2>Choose your games</h2>
+      <span class="muted">Tap to filter</span>
+    </div>
+    <div id="games" class="games"></div>
+
+    <div id="news-section" class="section-head">
+      <h2>Latest Gaming News</h2>
+      <span class="muted">KK Updates</span>
+    </div>
+    <div id="news-list" class="news-list"></div>
+  </section>
+
+  <section id="saved" class="page">
+    <div class="section-head"><h2>❤️ Saved News</h2></div>
+    <div id="saved-list" class="news-list"></div>
+  </section>
+
+  <section id="events" class="page">
+    <div class="section-head"><h2>🏆 Gaming Events</h2></div>
+    <div class="card">
+      <span class="tag">COMMUNITY</span>
+      <h3>KKGaming Tournament Board</h3>
+      <p>Discover gaming competitions and community events. Event listings will appear here as they are added.</p>
+    </div>
+    <div id="event-list" class="news-list"></div>
+    <p class="notice">Always verify tournament details with the organiser. Never pay an unverified person to enter a competition.</p>
+  </section>
+
+  <section id="account" class="page">
+    <div class="section-head"><h2>👤 Your Account</h2></div>
+    <div class="card">
+      <h3 id="account-title">Welcome to KKGaming News</h3>
+      <p id="account-description">Sign in to personalise your gaming experience.</p>
+      <form id="auth-form">
+        <input class="field" id="auth-email" type="email" placeholder="Email address" required>
+        <input class="field" id="auth-password" type="password" placeholder="Password" minlength="6" required>
+        <button class="primary full" type="submit">Continue</button>
+      </form>
+      <button class="small-btn full" id="auth-toggle" onclick="toggleAuth()">Need an account? Sign up</button>
+      <button class="small-btn full" id="logout" onclick="logout()" hidden>Log out</button>
+      <p class="notice">This first prototype does not create secure online accounts. Connect an authentication service before collecting real user credentials.</p>
+    </div>
+    <div class="section-head"><h2>⚙️ Settings</h2></div>
+    <div class="card">
+      <p>Selected games are saved on this device.</p>
+      <button class="small-btn" onclick="resetGames()">Reset game selection</button>
+    </div>
+  </section>
+
+  <section id="admin" class="page">
+    <div class="section-head"><h2>👑 News Publisher</h2></div>
+    <div class="card">
+      <p class="notice">Prototype only. This page is not protected by an admin login. Do not publish private information here. Posts are saved on this device only.</p>
+      <form id="news-form">
+        <input id="post-title" class="field" placeholder="News headline" maxlength="120" required>
+        <select id="post-game" class="field">
+          <option>Free Fire</option>
+          <option>Fortnite</option>
+          <option>Roblox</option>
+          <option>Blood Strike</option>
+          <option>Call of Duty Mobile</option>
+          <option>Minecraft</option>
+          <option>Other</option>
+        </select>
+        <textarea id="post-description" class="field" placeholder="Write your news..." rows="4" maxlength="2000" required></textarea>
+        <select id="post-type" class="field">
+          <option>Gaming News</option>
+          <option>Update</option>
+          <option>Tournament</option>
+          <option>Sponsored</option>
+        </select>
+        <button class="primary full" type="submit">Publish News</button>
+      </form>
+    </div>
+  </section>
+
+  <footer>KKGaming News © <span id="year"></span> · Built for gamers 🎮</footer>
+</main>
+
+<nav>
+  <button class="active" data-page="home" onclick="showPage('home',this)"><span>🏠</span>Home</button>
+  <button data-page="saved" onclick="showPage('saved',this)"><span>❤️</span>Saved</button>
+  <button data-page="events" onclick="showPage('events',this)"><span>🏆</span>Events</button>
+  <button data-page="admin" onclick="showPage('admin',this)"><span>✍️</span>Publish</button>
+  <button data-page="account" onclick="showPage('account',this)"><span>👤</span>Account</button>
+</nav>
+
+<script>
+const gameNames = [
+  "All Games", "Free Fire", "Fortnite", "Roblox",
+  "Blood Strike", "Call of Duty Mobile", "Minecraft"
+];
+
+const defaultNews = [
+  {
+    id: "welcome-1",
+    game: "All Games",
+    type: "WELCOME",
+    title: "Welcome to KKGaming News!",
+    description: "Your new home for gaming updates, community news and tournaments. Follow your favourite games and check back for new posts.",
+    date: new Date().toISOString(),
+    demo: true
+  },
+  {
+    id: "welcome-2",
+    game: "Free Fire",
+    type: "COMMUNITY",
+    title: "Free Fire Community Hub",
+    description: "Follow this category for Free Fire announcements, event coverage and community updates published by KKGaming News.",
+    date: new Date().toISOString(),
+    demo: true
+  },
+  {
+    id: "welcome-3",
+    game: "Fortnite",
+    type: "COMMUNITY",
+    title: "Fortnite Community Hub",
+    description: "Your place for Fortnite news, update coverage and tournament announcements as new stories are published.",
+    date: new Date().toISOString(),
+    demo: true
+  },
+  {
+    id: "welcome-4",
+    game: "Roblox",
+    type: "COMMUNITY",
+    title: "Roblox Community Hub",
+    description: "Explore Roblox news and community announcements posted to KKGaming News.",
+    date: new Date().toISOString(),
+    demo: true
+  }
+];
+
+function read(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+let news = read("kk_news", defaultNews);
+let selectedGame = "All Games";
+let selectedGames = read("kk_games", []);
+let savedIds = read("kk_saved", []);
+let signupMode = false;
+
+function persist() {
+  localStorage.setItem("kk_news", JSON.stringify(news));
+  localStorage.setItem("kk_games", JSON.stringify(selectedGames));
+  localStorage.setItem("kk_saved", JSON.stringify(savedIds));
+}
+
+function safeText(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function renderGames() {
+  document.getElementById("games").innerHTML = gameNames.map(game => `
+    <button class="game ${selectedGame === game ? "active" : ""}"
+      onclick="filterGame('${game.replace(/'/g, "\\'")}')">${safeText(game)}</button>
+  `).join("");
+}
+
+function renderNews() {
+  const query = document.getElementById("search").value.toLowerCase().trim();
+  const filtered = news.filter(item => {
+    const matchesGame = selectedGame === "All Games" ||
+      item.game === selectedGame || item.game === "All Games";
+    const matchesQuery = (item.title + " " + item.description + " " + item.game)
+      .toLowerCase().includes(query);
+    return matchesGame && matchesQuery;
+  });
+
+  const container = document.getElementById("news-list");
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty">No stories found. Try another game or search.</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(item => `
+    <article class="card">
+      <div class="card-top">
+        <span class="tag">${safeText(item.type || "NEWS")}</span>
+        <span class="muted">${safeText(item.game)}</span>
+      </div>
+      <h3>${safeText(item.title)}</h3>
+      <p>${safeText(item.description)}</p>
+      <div class="card-bottom">
+        <span class="muted">${item.demo ? "Welcome post" : "KKGaming News"} · ${new Date(item.date).toLocaleDateString()}</span>
+        <button class="small-btn ${savedIds.includes(item.id) ? "saved" : ""}"
+          onclick="toggleSave('${item.id}')">${savedIds.includes(item.id) ? "♥ Saved" : "♡ Save"}</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+function filterGame(game) {
+  selectedGame = game;
+  renderGames();
+  renderNews();
+}
+
+function toggleSave(id) {
+  savedIds = savedIds.includes(id)
+    ? savedIds.filter(savedId => savedId !== id)
+    : [...savedIds, id];
+  persist();
+  renderNews();
+  renderSaved();
+}
+
+function renderSaved() {
+  const items = news.filter(item => savedIds.includes(item.id));
+  document.getElementById("saved-list").innerHTML = items.length
+    ? items.map(item => `
+      <article class="card">
+        <span class="tag">${safeText(item.game)}</span>
+        <h3>${safeText(item.title)}</h3>
+        <p>${safeText(item.description)}</p>
+        <button class="small-btn" onclick="toggleSave('${item.id}')">Remove saved story</button>
+      </article>
+    `).join("")
+    : '<div class="empty">Your saved stories will appear here.</div>';
+}
+
+function renderEvents() {
+  const items = news.filter(item => item.type === "Tournament");
+  document.getElementById("event-list").innerHTML = items.length
+    ? items.map(item => `
+      <article class="card">
+        <span class="tag">${safeText(item.game)}</span>
+        <h3>${safeText(item.title)}</h3>
+        <p>${safeText(item.description)}</p>
+      </article>
+    `).join("")
+    : '<div class="empty">No events have been published yet.</div>';
+}
+
+function showPage(id, button) {
+  document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll("nav button").forEach(btn => btn.classList.remove("active"));
+  const navButton = button || document.querySelector(`nav button[data-page="${id}"]`);
+  if (navButton) navButton.classList.add("active");
+
+  if (id === "saved") renderSaved();
+  if (id === "events") renderEvents();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function toggleAuth() {
+  signupMode = !signupMode;
+  document.getElementById("auth-toggle").textContent =
+    signupMode ? "Already registered? Log in" : "Need an account? Sign up";
+  document.getElementById("account-title").textContent =
+    signupMode ? "Create your account" : "Welcome to KKGaming News";
+}
+
+document.getElementById("auth-form").addEventListener("submit", event => {
+  event.preventDefault();
+  alert("This prototype does not support real account registration yet. We need to connect a secure authentication service before enabling login.");
+});
+
+function logout() {
+  alert("No account is currently connected. Secure login will be added in a later step.");
+}
+
+function resetGames() {
+  selectedGames = [];
+  selectedGame = "All Games";
+  persist();
+  renderGames();
+  alert("Game selection has been reset.");
+}
+
+document.getElementById("news-form").addEventListener("submit", event => {
+  event.preventDefault();
+  const title = document.getElementById("post-title").value.trim();
+  const description = document.getElementById("post-description").value.trim();
+  const game = document.getElementById("post-game").value;
+  const type = document.getElementById("post-type").value;
+
+  if (!title || !description) return;
+
+  news.unshift({
+    id: "news-" + Date.now(),
+    game,
+    type,
+    title,
+    description,
+    date: new Date().toISOString(),
+    demo: false
+  });
+
+  persist();
+  event.target.reset();
+  selectedGame = "All Games";
+  renderGames();
+  renderNews();
+  renderEvents();
+  showPage("home");
+  alert("News published on this device!");
+});
+
+document.getElementById("year").textContent = new Date().getFullYear();
+
+renderGames();
+renderNews();
+renderSaved();
+renderEvents();
+</script>
+</body>
+</html>
