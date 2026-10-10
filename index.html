@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#080b12">
@@ -545,6 +546,96 @@ renderGames();
 renderNews();
 renderSaved();
 renderEvents();
+</script>
+  <script>
+const SUPABASE_URL = "https://ncrlagqvaxwncuuwidzc.supabase.co/rest/v1/";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_rrFCTlSFqEKwJgTLL-qIPw_5VyE7sTH";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+async function registerUser(email, password) {
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    alert("Signup failed: " + error.message);
+    return;
+  }
+
+  alert("Account created! Check your email if confirmation is required.");
+}
+
+async function loginUser(email, password) {
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    alert("Login failed: " + error.message);
+    return;
+  }
+
+  alert("Welcome to KKGaming News!");
+  updateAccountStatus();
+}
+
+async function logoutUser() {
+  const { error } = await supabaseClient.auth.signOut();
+
+  if (error) {
+    alert("Logout failed: " + error.message);
+    return;
+  }
+
+  alert("You have logged out.");
+  updateAccountStatus();
+}
+
+async function updateAccountStatus() {
+  const { data } = await supabaseClient.auth.getUser();
+  const user = data.user;
+
+  const title = document.getElementById("account-title");
+  const description = document.getElementById("account-description");
+  const logoutButton = document.getElementById("logout");
+  const form = document.getElementById("auth-form");
+  const toggle = document.getElementById("auth-toggle");
+
+  if (user) {
+    title.textContent = "Welcome to KKGaming News!";
+    description.textContent = user.email;
+    logoutButton.hidden = false;
+    form.hidden = true;
+    toggle.hidden = true;
+  } else {
+    title.textContent = "Welcome to KKGaming News";
+    description.textContent = "Sign in to personalise your gaming experience.";
+    logoutButton.hidden = true;
+    form.hidden = false;
+    toggle.hidden = false;
+  }
+}
+
+document.getElementById("auth-form").addEventListener("submit", async function(event) {
+  event.preventDefault();
+
+  const email = document.getElementById("auth-email").value.trim();
+  const password = document.getElementById("auth-password").value;
+
+  if (signupMode) {
+    await registerUser(email, password);
+  } else {
+    await loginUser(email, password);
+  }
+});
+
+updateAccountStatus();
 </script>
 </body>
 </html>
